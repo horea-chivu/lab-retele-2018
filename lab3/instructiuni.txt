@@ -1,0 +1,196 @@
+MENTIUNI
+
+1. Cand terminati ceva de facut in Terminal, Command Prompt, IP Configuration, Email etc,
+	inchideti apasand X din dreapta dreptunghiului albastru din partea superioara a ferestrei.
+
+2. Lucrati tot timpul cu max 2 ferestre asociate PT
+	(cea cu proiectul si cea cu echipamentul la care lucrati)
+
+3. In terminal, cand configuram switch-ul sau router-ul, putem sa folosim tasta <Tab> pentru
+	autocomplete(foarte util pentru viteza). Daca nu face imediat autocomplete inseamana ca
+	ati scris prea putin din fraza sau ! nu sunteti in modul potrivit !.
+
+
+ Lab3:
+
+	Datele:
+
+		CINFO(Calculator):
+			IP Addr: 172.17.212.38			// ip-ul alocat pentru calculator
+			SubMask: 255.255.255.224		// indica marimea subretelei
+			DefGate: 172.17.212.33			// ip-ul router-ului
+				DNS: 209.165.200.225 		// ip-ul serverului ce contine corespondentele domeniu->IP(Domain Name Server)
+
+		SWINFO(Switch):
+			Ip Addr vlan 1: 172.17.212.34
+			SubMask vlan 1: 255.255.255.224
+
+		RINFO(Router):
+			Ip Addr gigabitethernet 0/0: 172.17.212.33
+			SubMask gigabitethernet 0/0: 255.255.255.224
+
+1. Configurare calculator
+	- Se ia un calculator si se pune in stanga-jos a "plansei"
+
+	- Click pe el -> tab "Physical". 
+		a. Opriti tower-ul de la butonul rosu
+		b. In partea inferioara a tower-ului se afla placa de 
+			retea. Drag and drop in partea stanga a ferestrei.
+		c. Din stanga, drag and drop "PT-HOST-NM-1CGE"(CiscoGigabitEthernet)
+			in spatiul gol al placii de retea de pe calculator.
+		d. Power on
+
+	- -> tab "Desktop" -> IP Configuration -> Completati conform datelor de mai sus, 
+			lasand bifat "Static" -> apasati X(ca in MENTIUNEA 1)
+
+	- -> click "Email":
+		a. USER1 USER1@info.ro
+		b. 209.165.200.225 la amanadoua (adresa serverului)
+		c. USER1 123456
+		d. click "Save" -> apasati X(ca in MENTIUNEA 1)
+
+	- Am terminat cu calculatorul, acum inchidem fereastra(ca in MENTIUNEA 2)
+
+2. Configurare Switch:
+	- Se plaseaza un switch 2960 in dreapta sus a calculatorului
+
+	- Se plaseaza un laptop in stanga calculatorului si switch-ului 
+		si se ia un cablu "Console" -> click Laptop -> selectam "RS 232" -> click switch -> selectam "Console"
+
+	- Click pe Laptop -> tab "Desktop" -> click "Terminal" -> click "OK"
+	- Apasam <Enter> si rulam urmatoarele comenzi:
+
+	// CONFIGURARE DE BAZA
+
+	Switch> enable
+	Switch# configure terminal
+	Switch(config)# no ip domain lookup												// Daca nu scriem asta, cand introducem o comanda gresita, blocam switch-ul!!
+	Switch(config)# hostname SWINFO
+	SWINFO(config)# service password-encryption										// Cripteaza parolele, altfel sunt afisate in clar
+	SWINFO(config)# enable secret cisco12345
+	SWINFO(config)# enable password cisco54321
+	SWINFO(config)# banner motd "Vineri, la ora 14:00, serverul va fi oprit"		// MOTD = MessageOfTheDay
+	SWINFO(config)# line console 0
+	SWINFO(config-line)# password ciscoconpass
+	SWINFO(config-line)# login
+	SWINFO(config-line)# logging synchronous
+	SWINFO(config-line)# exec-timeout 10 10											// Te scoate dupa 10min si 10sec
+	SWINFO(config-line)# exit
+	SWINFO(config)# line vty 0 15
+	SWINFO(config-line)# password ciscovtypass
+	SWINFO(config-line)# login
+	SWINFO(config-line)# logging synchronous
+	SWINFO(config-line)# exec-timeout 15 15
+	SWINFO(config-line)# exit
+	SWINFO(config)# interface vlan 1
+	SWINFO(config-if)# description "Legatura cu CINFO"
+	SWINFO(config-if)# ip address 172.17.212.34 255.255.255.224
+	SWINFO(config-if)# no shutdown
+	SWINFO(config-if)# exit
+	SWINFO(config)# exit
+	SWINFO# copy running-config startup-config										// Salveaza tot ce am lucrat in cazul repornirii echipamentului
+		// apasam <Enter>
+
+	- click X din portiunea albastra -> inchidem fereastra
+	- luam un cablu "Copper Straight-Through" -> click pe calculator -> selectam "GigabitEthernet0"
+												-> click pe switch -> selectam "GigabitEthernet0/2"
+	- Testam conexiunea: click pe calculator -> tab "Desktop" -> click "Command Prompt":
+		a. scriem comanda "ping 172.17.212.34"
+				(prima data cand rulam comanda o sa piarda din pachete(e ok); la a doua rulare a comenzii
+					ar trebuii sa fie ok toate cele 4 pachete)
+		b. scriem comanda "telnet 172.17.212.34" -> introducem parola "ciscovtypass" -> scriem "enable" -> introducem parola "cisco12345"
+				Daca intra in modul privileded(cu # la sfarsit) -> scriem "exit" -> click pe X -> inchidem fereastra
+
+	- Daca cele 2 teste merg, trecem mai departe, daca nu, vedem ce am gresit
+
+3. Configurare SSH
+	- intram in terminal de pe Laptop(daca cere parola, "ciscoconpass")
+		-> intram in modul privileged (SWINFO#) prin rularea "enable"(daca SWINFO>; parola "cisco12345") sau "exit"(daca SWINFO(config)#)
+			si rulam urmatoarele comenzi:
+
+	SWINFO# clock set 14:37:00 6 MAR 2018											// Inclocuiti cu date reale
+	SWINFO# configure terminal
+	SWINFO(config)# ip domain name info.ro
+	SWINFO(config)# username admin privilege 15 secret adminpass1
+	SWINFO(config)# line vty 0 15
+	SWINFO(config-line)# transport input ssh
+	SWINFO(config-line)# login local
+	SWINFO(config-line)# exit
+	SWINFO(config)# crypto key generate rsa
+		// scriem 1024 si apasam <Enter>
+	SWINFO(config)# exit
+	SWINFO# copy running-config startup-config										// Salveaza tot ce am lucrat in cazul repornirii echipamentului
+		// apasam <Enter>
+	SWINFO# exit
+
+	-> apasam X -> inchidem fereastra
+
+	- testam ssh-ul -> click pe calculator -> tab "Desktop" -> click "Command Prompt" -> rulam "ssh -l admin 172.17.212.34"
+		-> introducem parola "adminpass1" -> apare "SWINFO#" => Succes
+
+4. Configurare Router:
+	- plasam in dreapta-sus fata de switch un router 2911
+	- cablu "Copper Straight-Through" din Switch(GigabitEthernet0/1) in Router(GigabitEthernet0/0)
+	- click pe cerculetul negru de la switch(la capatului cablului "Console") -> click pe router -> selectam "Console"
+	- intram in terminalul laptop-ului -> click pe "OK" -> scriem "no"(important), <Enter>, <Enter> si apare "Router>"
+	- rulam urmatoarele comenzi(comenzile notate cu * in fata sunt specifice router-ului Cisco):
+
+	Router> enable
+	Router# configure terminal
+	Router(config)# no ip domain lookup
+	Router(config)# hostname RINFO
+	RINFO(config)# service password-encryption
+	RINFO(config)# enable secret cisco12345
+	RINFO(config)# enable password cisco54321
+  *	RINFO(config)# security password min-length 10
+  *	RINFO(config)# login block-for 120 attempts 3 within 30
+  *	RINFO(config)# banner login "Accesul persoanelor neautorizate strict interzis"
+  	RINFO(config)# banner motd "Vineri, la ora 14:00, serverul va fi oprit"
+	RINFO(config)# line console 0
+	RINFO(config-line)# password ciscoconpass
+	RINFO(config-line)# login
+	RINFO(config-line)# logging synchronous
+	RINFO(config-line)# exec-timeout 10 10
+	RINFO(config-line)# exit
+	RINFO(config)# line vty 0 15
+	RINFO(config-line)# password ciscovtypass
+	RINFO(config-line)# login
+	RINFO(config-line)# logging synchronous
+	RINFO(config-line)# exec-timeout 15 15
+	RINFO(config-line)# exit
+	RINFO(config)# exit
+	RINFO# copy running-config startup-config
+		// apasam <Enter>
+	RINFO# clock set 14:37:00 6 MAR 2018											// Inclocuiti cu date reale
+	RINFO# configure terminal
+	RINFO(config)# ip domain name info.ro
+	RINFO(config)# username admin privilege 15 secret adminpass1
+	RINFO(config)# line vty 0 15
+	RINFO(config-line)# transport input ssh
+	RINFO(config-line)# login local
+	RINFO(config-line)# exit
+	RINFO(config)# crypto key generate rsa
+		// scriem 1024 si apasam <Enter>
+	RINFO(config)# exit
+	RINFO# copy running-config startup-config
+		// apasam <Enter>
+	RINFO# configure terminal
+	RINFO(config)# interface gigabitethernet 0/0
+	RINFO(config-if)# description "Legatura LAN 1"
+	RINFO(config-if)# ip address 172.17.212.33 255.255.255.224
+	RINFO(config-if)# no shutdown													// in momentul asta, cablul dintre Sw si R 
+																						// se face verde la capete dupa cateva secunde
+	RINFO(config-if)# exit
+	RINFO(config)# exit
+	RINFO# copy running-config startup-config
+		// apasam <Enter>
+	RINFO# exit
+
+	-> apasam X -> inchidem fereastra
+
+	- Testam conexiunea: click pe calculator -> tab "Desktop" -> click "Command Prompt":
+		a. rulam comanda "ping 172.17.212.33" -> primeste pachetele? -> trecem la ssh
+		b. rulam "ssh -l admin 172.17.212.33" -> introducem parola "adminpass1" -> apare "RINFO#" => Succes
+
+		OBS: Dupa setarea ssh-ului pe Switch sau pe Router, telnet NU o sa mai functioneze(ssh-ul este alternativa securizata
+										la telnet care are securitate proasta)
