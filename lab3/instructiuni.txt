@@ -64,9 +64,9 @@ MENTIUNI
 
 	Switch> enable
 	Switch# configure terminal
-	Switch(config)# no ip domain lookup												// Daca nu scriem asta, cand introducem o comanda gresita, blocam switch-ul!!
+	Switch(config)# no ip domain lookup							// Daca nu scriem asta, cand introducem o comanda gresita, blocam switch-ul!!
 	Switch(config)# hostname SWINFO
-	SWINFO(config)# service password-encryption										// Cripteaza parolele, altfel sunt afisate in clar
+	SWINFO(config)# service password-encryption						// Cripteaza parolele, altfel sunt afisate in clar
 	SWINFO(config)# enable secret cisco12345
 	SWINFO(config)# enable password cisco54321
 	SWINFO(config)# banner motd "Vineri, la ora 14:00, serverul va fi oprit"		// MOTD = MessageOfTheDay
@@ -74,7 +74,7 @@ MENTIUNI
 	SWINFO(config-line)# password ciscoconpass
 	SWINFO(config-line)# login
 	SWINFO(config-line)# logging synchronous
-	SWINFO(config-line)# exec-timeout 10 10											// Te scoate dupa 10min si 10sec
+	SWINFO(config-line)# exec-timeout 10 10							// Te scoate dupa 10min si 10sec
 	SWINFO(config-line)# exit
 	SWINFO(config)# line vty 0 15
 	SWINFO(config-line)# password ciscovtypass
@@ -88,7 +88,7 @@ MENTIUNI
 	SWINFO(config-if)# no shutdown
 	SWINFO(config-if)# exit
 	SWINFO(config)# exit
-	SWINFO# copy running-config startup-config										// Salveaza tot ce am lucrat in cazul repornirii echipamentului
+	SWINFO# copy running-config startup-config						// Salveaza tot ce am lucrat in cazul repornirii echipamentului
 		// apasam <Enter>
 
 	- click X din portiunea albastra -> inchidem fereastra
@@ -108,7 +108,7 @@ MENTIUNI
 		-> intram in modul privileged (SWINFO#) prin rularea "enable"(daca SWINFO>; parola "cisco12345") sau "exit"(daca SWINFO(config)#)
 			si rulam urmatoarele comenzi:
 
-	SWINFO# clock set 14:37:00 6 MAR 2018											// Inclocuiti cu date reale
+	SWINFO# clock set 14:37:00 6 MAR 2018							// Inclocuiti cu date reale
 	SWINFO# configure terminal
 	SWINFO(config)# ip domain name info.ro
 	SWINFO(config)# username admin privilege 15 secret adminpass1
@@ -119,7 +119,7 @@ MENTIUNI
 	SWINFO(config)# crypto key generate rsa
 		// scriem 1024 si apasam <Enter>
 	SWINFO(config)# exit
-	SWINFO# copy running-config startup-config										// Salveaza tot ce am lucrat in cazul repornirii echipamentului
+	SWINFO# copy running-config startup-config						// Salveaza tot ce am lucrat in cazul repornirii echipamentului
 		// apasam <Enter>
 	SWINFO# exit
 
@@ -161,7 +161,7 @@ MENTIUNI
 	RINFO(config)# exit
 	RINFO# copy running-config startup-config
 		// apasam <Enter>
-	RINFO# clock set 14:37:00 6 MAR 2018											// Inclocuiti cu date reale
+	RINFO# clock set 14:37:00 6 MAR 2018							// Inclocuiti cu date reale
 	RINFO# configure terminal
 	RINFO(config)# ip domain name info.ro
 	RINFO(config)# username admin privilege 15 secret adminpass1
@@ -178,8 +178,8 @@ MENTIUNI
 	RINFO(config)# interface gigabitethernet 0/0
 	RINFO(config-if)# description "Legatura LAN 1"
 	RINFO(config-if)# ip address 172.17.212.33 255.255.255.224
-	RINFO(config-if)# no shutdown													// in momentul asta, cablul dintre Sw si R 
-																						// se face verde la capete dupa cateva secunde
+	RINFO(config-if)# no shutdown								// in momentul asta, cablul dintre Sw si R 
+													// se face verde la capete dupa cateva secunde
 	RINFO(config-if)# exit
 	RINFO(config)# exit
 	RINFO# copy running-config startup-config
