@@ -1,0 +1,235 @@
+1. Calculator
+    - oprim calculatorul de la buton
+    - inlocuire placa de retea default cu "PT-HOST-NM-1CGE"
+    - pornim calculatorul de la buton
+    - configurare IP
+    - configurare E-MAIL
+
+2. Switch(2960)
+    - ne conectam cu laptop-ul printr-un cablu console
+        la Switch
+    - cablu: "Copper Straight-Through"(GE0 - GE0/2)
+
+Switch> enable
+Switch# configure terminal
+Switch(config)# no ip domain lookup
+Switch(config)# hostname SWINFO
+SWINFO(config)# service password-encryption
+SWINFO(config)# enable secret cisco12345
+SWINFO(config)# enable password cisco54321
+SWINFO(config)# banner motd "Vineri, la ora 14:00, serverul va fi oprit"
+SWINFO(config)# line console 0
+SWINFO(config-line)# password ciscoconpass
+SWINFO(config-line)# login
+SWINFO(config-line)# logging synchronous
+SWINFO(config-line)# exec-timeout 10 10
+SWINFO(config-line)# exit
+SWINFO(config)# line vty 0 15
+SWINFO(config-line)# password ciscovtypass
+SWINFO(config-line)# login
+SWINFO(config-line)# logging synchronous
+SWINFO(config-line)# exec-timeout 15 15
+SWINFO(config-line)# exit
+SWINFO(config)# exit
+SWINFO# copy running-config startup-config
+    // apasam <Enter>
+
+SWINFO# clock set 14:37:00 6 MAR 2018
+SWINFO# configure terminal
+SWINFO(config)# ip domain name info.ro
+SWINFO(config)# username admin privilege 15 secret adminpass1
+SWINFO(config)# line vty 0 15
+SWINFO(config-line)# transport input ssh
+SWINFO(config-line)# login local
+SWINFO(config-line)# exit
+SWINFO(config)# crypto key generate rsa
+    // scriem 1024 si apasam <Enter>
+SWINFO(config)# exit
+SWINFO# copy running-config startup-config
+    // apasam <Enter>
+
+SWINFO(config)# interface vlan 1
+SWINFO(config-if)# description "Legatura cu CINFO"
+SWINFO(config-if)# ip address 172.17.212.34 255.255.255.224
+SWINFO(config-if)# no shutdown
+SWINFO(config-if)# exit
+SWINFO(config)# exit
+SWINFO# copy running-config startup-config
+    // apasam <Enter>
+SWINFO# exit
+
+    - din calculator, din "Command Prompt" -> rulam "ping 172.17.212.34"
+                                        -> rulam "ssh -l admin 172.17.212.34"
+
+3. Router(2911)
+
+    - cablu: "Copper Straight-Through"(GE0/1 - GE0/0)
+    - intram in terminalul laptop-ului(conectat prin cablu console la router)
+        -> click pe "OK" -> scriem "no"(important), <Enter>, <Enter> si apare "Router>"
+
+Router> enable
+Router# configure terminal
+Router(config)# no ip domain lookup
+Router(config)# hostname RINFO
+RINFO(config)# service password-encryption
+RINFO(config)# enable secret cisco12345
+RINFO(config)# enable password cisco54321
+RINFO(config)# security password min-length 10
+RINFO(config)# login block-for 120 attempts 3 within 30
+RINFO(config)# banner login "Accesul persoanelor neautorizate strict interzis"
+RINFO(config)# banner motd "Vineri, la ora 14:00, serverul va fi oprit"
+RINFO(config)# line console 0
+RINFO(config-line)# password ciscoconpass
+RINFO(config-line)# login
+RINFO(config-line)# logging synchronous
+RINFO(config-line)# exec-timeout 10 10
+RINFO(config-line)# exit
+RINFO(config)# line vty 0 15
+RINFO(config-line)# password ciscovtypass
+RINFO(config-line)# login
+RINFO(config-line)# logging synchronous
+RINFO(config-line)# exec-timeout 15 15
+RINFO(config-line)# exit
+RINFO(config)# exit
+RINFO# copy running-config startup-config
+    // apasam <Enter>
+
+RINFO# clock set 14:37:00 6 MAR 2018
+RINFO# configure terminal
+RINFO(config)# ip domain name info.ro
+RINFO(config)# username admin privilege 15 secret adminpass1
+RINFO(config)# line vty 0 15
+RINFO(config-line)# transport input ssh
+RINFO(config-line)# login local
+RINFO(config-line)# exit
+RINFO(config)# crypto key generate rsa
+    // scriem 1024 si apasam <Enter>
+RINFO(config)# exit
+RINFO# copy running-config startup-config
+    // apasam <Enter>
+
+RINFO# configure terminal
+RINFO(config)# interface gigabitethernet 0/0
+RINFO(config-if)# description "Legatura LAN 1"
+RINFO(config-if)# ip address 172.17.212.33 255.255.255.224
+RINFO(config-if)# no shutdown
+RINFO(config-if)# exit
+RINFO(config)# exit
+RINFO# copy running-config startup-config
+    // apasam <Enter>
+RINFO# exit
+
+Router> enable
+Router# configure terminal
+Router(config)# no ip domain lookup
+Router(config)# hostname RINFO
+RINFO(config)# service password-encryption
+RINFO(config)# enable secret cisco12345
+RINFO(config)# enable password cisco54321
+RINFO(config)# security password min-length 10
+RINFO(config)# login block-for 120 attempts 3 within 30
+RINFO(config)# banner login "Accesul persoanelor neautorizate strict interzis"
+RINFO(config)# banner motd "Vineri, la ora 14:00, serverul va fi oprit"
+RINFO(config)# line console 0
+RINFO(config-line)# password ciscoconpass
+RINFO(config-line)# login
+RINFO(config-line)# logging synchronous
+RINFO(config-line)# exec-timeout 10 10
+RINFO(config-line)# exit
+RINFO(config)# line vty 0 15
+RINFO(config-line)# password ciscovtypass
+RINFO(config-line)# login
+RINFO(config-line)# logging synchronous
+RINFO(config-line)# exec-timeout 15 15
+RINFO(config-line)# exit
+RINFO(config)# exit
+RINFO# copy running-config startup-config
+    // apasam <Enter>
+
+RINFO# clock set 14:37:00 6 MAR 2018
+RINFO# configure terminal
+RINFO(config)# ip domain name info.ro
+RINFO(config)# username admin privilege 15 secret adminpass1
+RINFO(config)# line vty 0 15
+RINFO(config-line)# transport input ssh
+RINFO(config-line)# login local
+RINFO(config-line)# exit
+RINFO(config)# crypto key generate rsa
+    // scriem 1024 si apasam <Enter>
+RINFO(config)# exit
+RINFO# copy running-config startup-config
+    // apasam <Enter>
+
+RINFO# configure terminal
+RINFO(config)# interface gigabitethernet 0/0
+RINFO(config-if)# description "Legatura LAN 1"
+RINFO(config-if)# ip address 172.17.212.33 255.255.255.224
+RINFO(config-if)# no shutdown
+RINFO(config-if)# exit
+RINFO(config)# exit
+RINFO# copy running-config startup-config
+    // apasam <Enter>
+RINFO# exit
+
+4. Server
+    - oprim serverul de la buton
+    - inlocuire placa de retea default cu "PT-HOST-NM-1CGE"
+    - pornim serverul de la buton
+    - configurare IP
+    - configurare E-MAIL
+
+    - cablu: "Copper Cross-Over"(legatura Router cu Server; GE0/1 - GE0)
+
+    - din laptop(conectat cu cablul serial la router):
+
+    RINFO(config)# interface GigabitEthernet 0/1
+    RINFO(config-if)# ip address dg_server subnet_mask_server
+    RINFO(config-if)# Description "Legatura cu SERVER"
+    RINFO(config-if)# no shutdown
+    RINFO(config-if)# exit
+    RINFO(config)# exit
+    RINFO# copy running-config startup-config
+    RINFO# exit
+
+    - testeaza prin ping de la server la Router/Switch pana la
+        host-uri(calculatorul/calculatoarele care beneficiaza de
+        HTTP/DNS/E-MAIL/DHCP)
+
+    - Configurare servicii(tab "Services" la server):
+        - HTTP - HTTP - Off
+               - HTTPS - On
+
+        - DNS - DNS Service - On
+              - Name: "info.ro"
+              - Address: adresa serverului
+              - apasa "Add"
+
+        - E-MAIL - Domain Name: "info.ro" -> apasa "Set"
+                 - adauga toti userii din retele, pe rand, scriind user si password + apasa "+"
+
+                 - testeaza trimitand e-mail-uri de la un calculator la altul
+
+    - Configurare DHCP
+        Din tab-ul de "Services" -> DHCP
+            - Pool Name: "nume_retea"
+            - Default Gateway: dg_retea
+            - DNS: ip_server
+            - Start IP Address: inceputul_rangeului_de_ipuri_al_retelei
+            - Subnet Mask: sm_retea
+            - Maximum Number of Users: capacitate_conform_reteli
+
+            - click "Add"
+
+        - din laptop(conectat cu cablul serial la router):
+
+        RINFO(config)# interface GigabitEthernet 0/0
+        RINFO(config-if)# ip helper-address 209.165.200.254
+        RINFO(config-if)# exit
+        RINFO(config)# exit
+        RINFO# copy running-config startup-config
+        RINFO# exit
+
+        - din calculator, la IP Configuration, selectam de la "Static" la "DHCP"
+
+        - testam ca host-ul functioneaza prin ping, ssh, etc
+
